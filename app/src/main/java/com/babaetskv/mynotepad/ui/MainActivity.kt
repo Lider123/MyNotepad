@@ -1,11 +1,11 @@
-package com.babaetskv.mynotepad
+package com.babaetskv.mynotepad.ui
 
-import android.app.Activity
 import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.widget.Adapter
-import android.widget.ArrayAdapter
+import com.babaetskv.mynotepad.MainApplication
+import com.babaetskv.mynotepad.adapter.NoteAdapter
+import com.babaetskv.mynotepad.R
 import kotlinx.android.synthetic.main.activity_main.*
 
 class MainActivity : AppCompatActivity() {
@@ -25,14 +25,16 @@ class MainActivity : AppCompatActivity() {
 
         fab_add.setOnClickListener {
             val intent = Intent(this, NoteActivity::class.java)
-            startActivityForResult(intent, NOTES_REQUEST_CODE)
+            startActivityForResult(intent,
+                NOTES_REQUEST_CODE
+            )
         }
 
         loadNotes()
     }
 
     private fun loadNotes() {
-        val notes = MainApplication.instance.sharedPrefsHelper.getNotes()
+        val notes = MainApplication.instance.database.noteDao().getAll()
         val adapter = NoteAdapter(this, notes)
         notes_list.adapter = adapter
     }

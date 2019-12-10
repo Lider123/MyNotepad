@@ -1,10 +1,11 @@
-package com.babaetskv.mynotepad
+package com.babaetskv.mynotepad.ui
 
 import android.app.AlertDialog
 import android.content.Context
 import android.text.Editable
 import android.text.TextWatcher
 import android.widget.EditText
+import com.babaetskv.mynotepad.R
 
 /**
  * @author babaetskv on 10.12.19

@@ -1,4 +1,4 @@
-package com.babaetskv.mynotepad
+package com.babaetskv.mynotepad.adapter
 
 import android.content.Context
 import android.content.Intent
@@ -7,7 +7,9 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.BaseAdapter
 import android.widget.TextView
-import org.w3c.dom.Text
+import com.babaetskv.mynotepad.R
+import com.babaetskv.mynotepad.data.Note
+import com.babaetskv.mynotepad.ui.NoteActivity
 import java.text.SimpleDateFormat
 
 /**
