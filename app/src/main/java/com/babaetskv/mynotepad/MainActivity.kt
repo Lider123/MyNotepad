@@ -1,22 +1,43 @@
 package com.babaetskv.mynotepad
 
+import android.app.Activity
+import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.widget.Adapter
 import android.widget.ArrayAdapter
 import kotlinx.android.synthetic.main.activity_main.*
 
 class MainActivity : AppCompatActivity() {
-    private val notes = listOf(
-        Note("Note 1", "Simple note", 0),
-        Note("Note 2", "Another simple note", 5),
-        Note("Note 3", "Yet another simple note", 4)
-    )
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+        if (requestCode == NOTES_REQUEST_CODE) {
+            if (resultCode == RESULT_OK) {
+                loadNotes()
+            }
+        }
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
+        fab_add.setOnClickListener {
+            val intent = Intent(this, NoteActivity::class.java)
+            startActivityForResult(intent, NOTES_REQUEST_CODE)
+        }
+
+        loadNotes()
+    }
+
+    private fun loadNotes() {
+        val notes = MainApplication.instance.sharedPrefsHelper.getNotes()
         val adapter = NoteAdapter(this, notes)
         notes_list.adapter = adapter
+    }
+
+    companion object {
+        private const val NOTES_REQUEST_CODE = 101
     }
 }

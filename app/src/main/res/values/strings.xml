@@ -1,4 +1,8 @@
 <resources>
     <string name="app_name">MyNotepad</string>
     <string name="create_note">Create a note</string>
+    <string name="title">Title</string>
+    <string name="ok">OK</string>
+    <string name="cancel">Cancel</string>
+    <string name="set_title">Set title</string>
 </resources>
