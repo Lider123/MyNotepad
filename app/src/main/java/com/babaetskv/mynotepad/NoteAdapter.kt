@@ -1,13 +1,12 @@
 package com.babaetskv.mynotepad
 
 import android.content.Context
+import android.content.Intent
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.ArrayAdapter
 import android.widget.BaseAdapter
 import android.widget.TextView
-import org.w3c.dom.Text
 
 /**
  * @author babaetskv on 10.12.19
@@ -17,7 +16,13 @@ class NoteAdapter(private val context: Context, private val items: List<Note>) :
     override fun getView(position: Int, convertView: View?, parent: ViewGroup?): View {
         val inflater = LayoutInflater.from(context)
         val view = inflater.inflate(android.R.layout.simple_expandable_list_item_1, parent, false)
-        view.findViewById<TextView>(android.R.id.text1).text = getItem(position).title
+        val note = getItem(position)
+        view.findViewById<TextView>(android.R.id.text1).text = note.title
+        view.setOnClickListener {
+            val intent = Intent(context, NoteActivity::class.java)
+            intent.putExtra(NoteActivity.EXTRA_NOTE, note)
+            context.startActivity(intent)
+        }
         return view
     }
 
