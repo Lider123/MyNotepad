@@ -7,6 +7,8 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.BaseAdapter
 import android.widget.TextView
+import org.w3c.dom.Text
+import java.text.SimpleDateFormat
 
 /**
  * @author babaetskv on 10.12.19
@@ -15,9 +17,10 @@ class NoteAdapter(private val context: Context, private val items: List<Note>) :
 
     override fun getView(position: Int, convertView: View?, parent: ViewGroup?): View {
         val inflater = LayoutInflater.from(context)
-        val view = inflater.inflate(android.R.layout.simple_expandable_list_item_1, parent, false)
+        val view = inflater.inflate(R.layout.item_note, parent, false)
         val note = getItem(position)
-        view.findViewById<TextView>(android.R.id.text1).text = note.title
+        view.findViewById<TextView>(R.id.item_note_title).text = note.title
+        view.findViewById<TextView>(R.id.item_note_date).text = SimpleDateFormat("dd.MM.yyyy").format(note.updatedAt)
         view.setOnClickListener {
             val intent = Intent(context, NoteActivity::class.java)
             intent.putExtra(NoteActivity.EXTRA_NOTE, note)
