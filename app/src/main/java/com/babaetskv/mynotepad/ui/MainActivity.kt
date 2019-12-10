@@ -6,9 +6,13 @@ import android.os.Bundle
 import com.babaetskv.mynotepad.MainApplication
 import com.babaetskv.mynotepad.adapter.NoteAdapter
 import com.babaetskv.mynotepad.R
+import io.reactivex.android.schedulers.AndroidSchedulers
+import io.reactivex.disposables.CompositeDisposable
+import io.reactivex.schedulers.Schedulers
 import kotlinx.android.synthetic.main.activity_main.*
 
 class MainActivity : AppCompatActivity() {
+    private val compositeDisposable = CompositeDisposable()
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
@@ -33,10 +37,21 @@ class MainActivity : AppCompatActivity() {
         loadNotes()
     }
 
+    override fun onStop() {
+        super.onStop()
+        compositeDisposable.dispose()
+    }
+
     private fun loadNotes() {
-        val notes = MainApplication.instance.database.noteDao().getAll()
-        val adapter = NoteAdapter(this, notes)
-        notes_list.adapter = adapter
+        compositeDisposable.add(
+            MainApplication.instance.database.noteDao().getAll()
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe { notes ->
+                    val adapter = NoteAdapter(this, notes)
+                    notes_list.adapter = adapter
+                }
+        )
     }
 
     companion object {
