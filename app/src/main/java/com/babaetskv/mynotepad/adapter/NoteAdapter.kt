@@ -2,6 +2,7 @@ package com.babaetskv.mynotepad.adapter
 
 import android.content.Context
 import android.view.LayoutInflater
+import android.view.MotionEvent
 import android.view.View
 import android.view.ViewGroup
 import android.widget.BaseAdapter
@@ -16,7 +17,8 @@ import java.text.SimpleDateFormat
 class NoteAdapter(
     private val context: Context,
     private var items: List<Note>,
-    private val onItemClick: (item: Note) -> Unit
+    private val onItemClick: (item: Note) -> Unit,
+    private val onItemLongClick: (item: Note) -> Unit
 ) : BaseAdapter() {
 
     override fun getView(position: Int, convertView: View?, parent: ViewGroup?): View {
@@ -27,6 +29,10 @@ class NoteAdapter(
             findViewById<TextView>(R.id.item_note_date).text = SimpleDateFormat("dd.MM.yyyy").format(note.updatedAt)
             setOnClickListener {
                 onItemClick(note)
+            }
+            setOnLongClickListener {
+                onItemLongClick(note)
+                true
             }
         }
     }

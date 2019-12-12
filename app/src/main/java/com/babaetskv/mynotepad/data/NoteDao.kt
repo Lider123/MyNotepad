@@ -1,6 +1,7 @@
 package com.babaetskv.mynotepad.data
 
 import androidx.room.*
+import io.reactivex.Completable
 import io.reactivex.Maybe
 import io.reactivex.Single
 
@@ -23,5 +24,5 @@ interface NoteDao {
     fun update(note: Note)
 
     @Delete
-    fun delete(note: Note)
+    fun delete(note: Note): Completable
 }
