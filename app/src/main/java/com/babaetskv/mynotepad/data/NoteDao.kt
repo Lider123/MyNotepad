@@ -1,9 +1,8 @@
 package com.babaetskv.mynotepad.data
 
 import androidx.room.*
-import com.babaetskv.mynotepad.data.Note
-import io.reactivex.Flowable
 import io.reactivex.Maybe
+import io.reactivex.Single
 
 /**
  * @author babaetskv on 10.12.19
@@ -12,7 +11,7 @@ import io.reactivex.Maybe
 interface NoteDao {
 
     @Query("SELECT * FROM note")
-    fun getAll(): Flowable<List<Note>>
+    fun getAll(): Single<List<Note>>
 
     @Query("SELECT * FROM note WHERE id = :id")
     fun getById(id: String): Maybe<Note>

@@ -65,7 +65,7 @@ class NoteActivity : AppCompatActivity() {
                 override fun onComplete() {
                     val intent = Intent()
                     intent.putExtra(EXTRA_NOTE, note)
-                    setResult(Activity.RESULT_OK, intent)
+                    setResult(RESULT_OK, intent)
                     finish()
                 }
 

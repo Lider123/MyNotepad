@@ -7,19 +7,16 @@ import com.babaetskv.mynotepad.MainApplication
 import com.babaetskv.mynotepad.adapter.NoteAdapter
 import com.babaetskv.mynotepad.R
 import io.reactivex.android.schedulers.AndroidSchedulers
-import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.schedulers.Schedulers
 import kotlinx.android.synthetic.main.activity_main.*
 
 class MainActivity : AppCompatActivity() {
-    private val compositeDisposable = CompositeDisposable()
+    private lateinit var adapter: NoteAdapter
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
         if (requestCode == NOTES_REQUEST_CODE) {
-            if (resultCode == RESULT_OK) {
-                loadNotes()
-            }
+            if (resultCode == RESULT_OK) loadNotes()
         }
     }
 
@@ -27,31 +24,31 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
+        initList()
         fab_add.setOnClickListener {
             val intent = Intent(this, NoteActivity::class.java)
-            startActivityForResult(intent,
-                NOTES_REQUEST_CODE
-            )
+            startActivityForResult(intent, NOTES_REQUEST_CODE)
         }
 
         loadNotes()
     }
 
-    override fun onStop() {
-        super.onStop()
-        compositeDisposable.dispose()
+    private fun initList() {
+        adapter = NoteAdapter(this, listOf()) { note ->
+            val intent = Intent(this, NoteActivity::class.java)
+            intent.putExtra(NoteActivity.EXTRA_NOTE, note)
+            startActivityForResult(intent, NOTES_REQUEST_CODE)
+        }
+        notes_list.adapter = adapter
     }
 
     private fun loadNotes() {
-        compositeDisposable.add(
-            MainApplication.instance.database.noteDao().getAll()
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe { notes ->
-                    val adapter = NoteAdapter(this, notes)
-                    notes_list.adapter = adapter
-                }
-        )
+        MainApplication.instance.database.noteDao().getAll()
+            .subscribeOn(Schedulers.io())
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribe { notes ->
+                adapter.setItems(notes)
+            }
     }
 
     companion object {
