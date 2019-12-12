@@ -3,13 +3,8 @@ package com.babaetskv.mynotepad.ui
 import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import com.babaetskv.mynotepad.MainApplication
 import com.babaetskv.mynotepad.R
 import com.babaetskv.mynotepad.data.Note
-import io.reactivex.CompletableObserver
-import io.reactivex.android.schedulers.AndroidSchedulers
-import io.reactivex.disposables.Disposable
-import io.reactivex.schedulers.Schedulers
 import kotlinx.android.synthetic.main.activity_note.*
 import java.util.*
 
@@ -52,24 +47,10 @@ class NoteActivity : AppCompatActivity() {
     }
 
     private fun handleSubmit(note: Note) {
-        val completable = if (createMode) {
-            MainApplication.instance.database.noteDao().insert(note)
-        } else MainApplication.instance.database.noteDao().update(note)
-        completable.observeOn(AndroidSchedulers.mainThread())
-            .subscribeOn(Schedulers.io())
-            .subscribe(object: CompletableObserver {
-
-                override fun onComplete() {
-                    val intent = Intent()
-                    intent.putExtra(EXTRA_NOTE, note)
-                    setResult(RESULT_OK, intent)
-                    finish()
-                }
-
-                override fun onSubscribe(d: Disposable) = Unit
-
-                override fun onError(e: Throwable) = Unit
-            })
+        val intent = Intent()
+        intent.putExtra(EXTRA_NOTE, note)
+        setResult(RESULT_OK, intent)
+        finish()
     }
 
     companion object {

@@ -4,23 +4,36 @@ import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import androidx.appcompat.app.AlertDialog
-import com.babaetskv.mynotepad.MainApplication
+import androidx.lifecycle.Observer
+import androidx.lifecycle.ViewModelProviders
+import androidx.room.Room
+import com.babaetskv.mynotepad.NotesViewModel
 import com.babaetskv.mynotepad.adapter.NoteAdapter
 import com.babaetskv.mynotepad.R
+import com.babaetskv.mynotepad.data.AppDatabase
 import com.babaetskv.mynotepad.data.Note
-import io.reactivex.android.schedulers.AndroidSchedulers
-import io.reactivex.disposables.Disposable
-import io.reactivex.schedulers.Schedulers
 import kotlinx.android.synthetic.main.activity_main.*
 
 class MainActivity : AppCompatActivity() {
     private lateinit var adapter: NoteAdapter
-    private var disposable: Disposable? = null
+    private lateinit var model: NotesViewModel
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
-        if (requestCode == NOTES_REQUEST_CODE) {
-            if (resultCode == RESULT_OK) loadNotes()
+        if (requestCode == CREATE_NOTE_REQUEST_CODE) {
+            if (resultCode == RESULT_OK) {
+                data?.extras?.getSerializable(NoteActivity.EXTRA_NOTE)?.let {
+                    it as Note
+                    model.addNote(it)
+                }
+            }
+        } else if (requestCode == UPDATE_NOTE_REQUEST_CODE) {
+            if (resultCode == RESULT_OK) {
+                data?.extras?.getSerializable(NoteActivity.EXTRA_NOTE)?.let {
+                    it as Note
+                    model.updateNote(it)
+                }
+            }
         }
     }
 
@@ -31,23 +44,30 @@ class MainActivity : AppCompatActivity() {
         initList()
         fab_add.setOnClickListener {
             val intent = Intent(this, NoteActivity::class.java)
-            startActivityForResult(intent, NOTES_REQUEST_CODE)
+            startActivityForResult(intent, CREATE_NOTE_REQUEST_CODE)
         }
+    }
 
-        loadNotes()
+    override fun onStart() {
+        super.onStart()
+        val database = Room.databaseBuilder(applicationContext, AppDatabase::class.java, "database").build()
+        val factory = NotesViewModel.Factory(database)
+        model = ViewModelProviders.of(this, factory).get(NotesViewModel::class.java)
+        model.notesLiveData.observe(this, Observer { notes ->
+            adapter.setItems(notes)
+        })
+        model.getNotes()
     }
 
     override fun onStop() {
         super.onStop()
-        disposable?.let {
-            if (!it.isDisposed) it.dispose()
-        }
+        model.stop()
     }
 
     private fun onNoteClick(note: Note) {
         val intent = Intent(this, NoteActivity::class.java)
         intent.putExtra(NoteActivity.EXTRA_NOTE, note)
-        startActivityForResult(intent, NOTES_REQUEST_CODE)
+        startActivityForResult(intent, UPDATE_NOTE_REQUEST_CODE)
     }
 
     private fun onNoteLongClick(note: Note) {
@@ -55,15 +75,10 @@ class MainActivity : AppCompatActivity() {
             .setTitle(R.string.dialog_deletion_title)
             .setMessage(R.string.dialog_deletion_message)
             .setPositiveButton(R.string.yes) { dialog, _ ->
-                MainApplication.instance.database.noteDao().delete(note)
-                    .subscribeOn(Schedulers.io())
-                    .observeOn(AndroidSchedulers.mainThread())
-                    .subscribe {
-                        dialog?.cancel()
-                        loadNotes()
-                    }
+                model.deleteNote(note)
+                dialog.cancel()
             }
-            .setNegativeButton(R.string.no) { dialog, _ -> dialog?.cancel() }
+            .setNegativeButton(R.string.no) { dialog, _ -> dialog.cancel() }
             .show()
     }
 
@@ -72,16 +87,8 @@ class MainActivity : AppCompatActivity() {
         notes_list.adapter = adapter
     }
 
-    private fun loadNotes() {
-        disposable = MainApplication.instance.database.noteDao().getAll()
-            .subscribeOn(Schedulers.io())
-            .observeOn(AndroidSchedulers.mainThread())
-            .subscribe { notes ->
-                adapter.setItems(notes)
-            }
-    }
-
     companion object {
-        private const val NOTES_REQUEST_CODE = 101
+        private const val CREATE_NOTE_REQUEST_CODE = 101
+        private const val UPDATE_NOTE_REQUEST_CODE = 102
     }
 }
