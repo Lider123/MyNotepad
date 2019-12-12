@@ -23,18 +23,23 @@ class NoteAdapter(
 
     override fun getView(position: Int, convertView: View?, parent: ViewGroup?): View {
         val inflater = LayoutInflater.from(context)
-        return inflater.inflate(R.layout.item_note, parent, false).apply {
-            val note = getItem(position)
-            findViewById<TextView>(R.id.item_note_title).text = note.title
-            findViewById<TextView>(R.id.item_note_date).text = SimpleDateFormat("dd.MM.yyyy", Locale.getDefault()).format(note.updatedAt)
-            setOnClickListener {
-                onItemClick(note)
+        val note = getItem(position)
+
+        return convertView
+            ?: inflater.inflate(R.layout.item_note, parent, false).apply {
+                setOnClickListener {
+                    onItemClick(note)
+                }
+                setOnLongClickListener {
+                    onItemLongClick(note)
+                    true
+                }
+
+                tag = ViewHolder(this).apply {
+                    titleView.text = note.title
+                    dateView.text = SimpleDateFormat("dd.MM.yyyy", Locale.getDefault()).format(note.updatedAt)
+                }
             }
-            setOnLongClickListener {
-                onItemLongClick(note)
-                true
-            }
-        }
     }
 
     override fun getItem(position: Int) = items[position]
@@ -46,5 +51,10 @@ class NoteAdapter(
     fun setItems(items: List<Note>) {
         this.items = items
         notifyDataSetChanged()
+    }
+
+    private class ViewHolder(view: View) {
+        var titleView: TextView = view.findViewById(R.id.item_note_title)
+        var dateView: TextView = view.findViewById(R.id.item_note_date)
     }
 }
