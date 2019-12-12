@@ -18,10 +18,10 @@ interface NoteDao {
     fun getById(id: String): Maybe<Note>
 
     @Insert
-    fun insert(note: Note)
+    fun insert(note: Note): Completable
 
     @Update
-    fun update(note: Note)
+    fun update(note: Note): Completable
 
     @Delete
     fun delete(note: Note): Completable

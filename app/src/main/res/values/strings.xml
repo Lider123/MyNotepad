@@ -5,4 +5,8 @@
     <string name="ok">OK</string>
     <string name="cancel">Cancel</string>
     <string name="set_title">Set title</string>
+    <string name="dialog_deletion_title">Deletion</string>
+    <string name="dialog_deletion_message">Are you sure you want to delete note?</string>
+    <string name="yes">Yes</string>
+    <string name="no">No</string>
 </resources>

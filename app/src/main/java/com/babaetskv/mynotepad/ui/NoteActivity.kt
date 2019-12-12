@@ -1,13 +1,11 @@
 package com.babaetskv.mynotepad.ui
 
-import android.app.Activity
 import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import com.babaetskv.mynotepad.MainApplication
 import com.babaetskv.mynotepad.R
 import com.babaetskv.mynotepad.data.Note
-import io.reactivex.Completable
 import io.reactivex.CompletableObserver
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.Disposable
@@ -50,15 +48,14 @@ class NoteActivity : AppCompatActivity() {
 
     override fun onBackPressed() {
         super.onBackPressed()
-        setResult(Activity.RESULT_CANCELED)
+        setResult(RESULT_CANCELED)
     }
 
     private fun handleSubmit(note: Note) {
-        Completable.fromAction {
-            if (createMode) {
-                MainApplication.instance.database.noteDao().insert(note)
-            } else MainApplication.instance.database.noteDao().update(note)
-        }.observeOn(AndroidSchedulers.mainThread())
+        val completable = if (createMode) {
+            MainApplication.instance.database.noteDao().insert(note)
+        } else MainApplication.instance.database.noteDao().update(note)
+        completable.observeOn(AndroidSchedulers.mainThread())
             .subscribeOn(Schedulers.io())
             .subscribe(object: CompletableObserver {
 

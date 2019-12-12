@@ -9,8 +9,7 @@ import com.babaetskv.mynotepad.data.AppDatabase
  */
 class MainApplication : Application() {
     val database: AppDatabase by lazy {
-        Room.databaseBuilder(applicationContext, AppDatabase::class.java, "database")
-            .build()
+        Room.databaseBuilder(applicationContext, AppDatabase::class.java, "database").build()
     }
 
     override fun onCreate() {
